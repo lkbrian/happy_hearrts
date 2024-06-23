@@ -1,0 +1,27 @@
+server/.env
+server/migrations
+server/instance
+server/instance/*.db
+
+.vscode
+server/routes/__pycache__
+server/models/__pycache__
+__pycache__/
+*.py[cod]
+server/*.pyc
+
+# Ignore database files
+*.sqlite
+*.db
+
+# Ignore environment specific files
+.env
+
+# Ignore IDE specific files (adjust as per your IDE)
+.vscode/
+
+# Ignore log files
+*.log
+
+# Ignore other generated files or directories
+*.egg-info/

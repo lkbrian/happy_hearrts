@@ -1,0 +1,30 @@
+from sqlalchemy import Enum
+from config import db
+from sqlalchemy_serializer import SerializerMixin
+from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
+
+
+class User(db.Model, SerializerMixin):
+    __tablename__ = "users"
+    user_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(70), nullable=False)
+    role = db.Column(
+        Enum("provider", "parent", "admin", "recieption_desk", "accounts_desk"),
+        nullable=False,
+    )
+    password_hash = db.Column(db.String, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    __mapper_args__ = {"polymorphic_on": role}
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+class Admin(User):
+    __mapper_args__ = {"polymorphic_identity": "admin"}
