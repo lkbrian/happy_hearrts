@@ -33,3 +33,11 @@ jwt.init_app(app)
 api=Api(app)
 migrate=Migrate(app,db)
 CORS(app)
+
+# constants.py
+
+valid_roles = [
+    "admin",
+    "reception_desk",
+    "accounts_desk",
+]
