@@ -19,9 +19,21 @@ class Provider(db.Model, SerializerMixin):
     national_id = db.Column(db.Integer, unique=True, nullable=False)
     phone_number = db.Column(db.Integer, nullable=False, unique=True)
     gender = db.Column(db.String, nullable=False)
-    passport = db.Column(db.String, nullable=False)
+    passport = db.Column(
+        db.String,
+        nullable=False,
+        default="https://res.cloudinary.com/dg6digtc4/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1722952459/profile_xkjsxh.jpg",
+    )
     password_hash = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    deliveries = db.relationship(
+        "Delivery", back_populates="provider", cascade="all, delete-orphan"
+    )
+
+    discharge_summaries = db.relationship(
+        "Discharge_summary", back_populates="provider"
+    )
 
     appointments = db.relationship(
         "Appointment", back_populates="provider", cascade="all, delete-orphan"
@@ -29,6 +41,12 @@ class Provider(db.Model, SerializerMixin):
     vaccination_records = db.relationship(
         "Record", back_populates="provider", cascade="all, delete-orphan"
     )
+
+    medications = db.relationship(
+        "Medications", back_populates="provider", cascade="all, delete-orphan"
+    )
+
+    reset_tokens = db.relationship("ResetToken", back_populates="provider")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

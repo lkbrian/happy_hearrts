@@ -25,6 +25,8 @@ class User(db.Model, SerializerMixin):
     password_hash = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    reset_tokens = db.relationship("ResetToken", back_populates="user")
+
     __mapper_args__ = {"polymorphic_on": role}
 
     def set_password(self, password):

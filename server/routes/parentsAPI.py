@@ -39,10 +39,10 @@ class parentsAPI(Resource):
 
         except IntegrityError:
             db.session.rollback()
-            return jsonify({"msg": "Integrity constraint failed"}), 400
+            return make_response(jsonify({"msg": "Integrity constraint failed"}), 400)
 
         except Exception as e:
-            return jsonify({"msg": str(e)}), 500
+            return make_response(jsonify({"msg": str(e)}), 500)
 
     def patch(self,id):
         data = request.json

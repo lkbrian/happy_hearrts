@@ -3,6 +3,11 @@ from flask import jsonify,make_response,request
 from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity,unset_jwt_cookies
 from models import User,Provider,Parent
 
+
+class Home(Resource):
+    def get(self):
+        return make_response(jsonify({"msg":"Welcome to happy hearts api endpoints"}),200)
+
 class Login(Resource):
     def post(self):
         data = request.json
