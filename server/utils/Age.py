@@ -1,9 +1,15 @@
-from datetime import  date
+from datetime import date, datetime
 
 
-def calculate_age( Date_Of_birth):
-    if Date_Of_birth < date.today():
-        birth_date = Date_Of_birth
+def calculate_age(Date_Of_birth):
+    # Parse the date string to a date object
+    try:
+        birth_date = datetime.strptime(Date_Of_birth, "%Y/%m/%d").date()
+    except ValueError:
+        print("\033[91m Invalid date format. Use YYYY/MM/DD. \033[0m")
+        return
+
+    if birth_date < date.today():
         current_date = date.today()
         years = current_date.year - birth_date.year
         months = current_date.month - birth_date.month
@@ -21,6 +27,12 @@ def calculate_age( Date_Of_birth):
         weeks = days // 7
         days %= 7
 
-        return years, months, weeks, days
+        return f"{years}years, {months}months, {weeks}weeks, {days}days"
     else:
         print("\033[91m Enter a past date \033[0m")
+
+
+# Example usage
+# age = calculate_age("2011/08/07")
+# if age:
+#     print(f"Years: {age[0]}, Months: {age[1]}, Weeks: {age[2]}, Days: {age[3]}")

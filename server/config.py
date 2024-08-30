@@ -8,6 +8,7 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
 load_dotenv()
 
 app=Flask(__name__)
@@ -16,6 +17,12 @@ app.secret_key=os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI']=os.environ.get("DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=False
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
+app.config["MAIL_SERVER"] = "smtp.googlemail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USE_SSL"] = False
 app.json.compact=False
 
 metadata = MetaData(
@@ -33,3 +40,13 @@ jwt.init_app(app)
 api=Api(app)
 migrate=Migrate(app,db)
 CORS(app)
+
+mail = Mail(app)
+
+# constants.py
+
+valid_roles = [
+    "admin",
+    "reception_desk",
+    "accounts_desk",
+]
