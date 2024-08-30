@@ -85,63 +85,64 @@ class ForgotPassword(Resource):
             db.session.rollback()
             return make_response(jsonify({'error': 'An error occurred while sending the email. Please try again later.'}), 500)
 
-        
-
 
 class ResetPassword(Resource):
-
     def post(self):
         data = request.json
         token = data.get("token")
         new_password = data.get("new_password")
         confirm_password = data.get("confirm_password")
+        account_type = data.get("account_type")  # New field to identify account type
 
+        # Validate inputs
         if not token:
-            return make_response(jsonify({"error": "Token is required"}), 400)
+            return make_response(jsonify({"msg": "Token is required"}), 400)
         if not new_password or not confirm_password:
-            return make_response(
-                jsonify({"error": "Password fields are required"}), 400
-            )
+            return make_response(jsonify({"msg": "Password fields are required"}), 400)
         if new_password != confirm_password:
-            return make_response(jsonify({"error": "Passwords do not match"}), 400)
+            return make_response(jsonify({"msg": "Passwords do not match"}), 400)
 
         # Find the reset token entry
         reset_token_entry = ResetToken.query.filter_by(token=token).first()
 
-        if reset_token_entry:
-            # Check if the token is expired
-            if reset_token_entry.expires_at < datetime.utcnow():
-                db.session.delete(reset_token_entry)
-                db.session.commit()
-                return make_response(jsonify({"error": "Token has expired"}), 400)
+        if not reset_token_entry:
+            return make_response(jsonify({"msg": "Invalid or expired token"}), 400)
 
-            # Determine the entity associated with the reset token
-            if reset_token_entry.user_id:
-                entity = User.query.filter_by(user_id=reset_token_entry.user_id).first()
-            elif reset_token_entry.parent_id:
-                entity = Parent.query.filter_by(
-                    parent_id=reset_token_entry.parent_id
-                ).first()
-            elif reset_token_entry.provider_id:
-                entity = Provider.query.filter_by(
-                    provider_id=reset_token_entry.provider_id
-                ).first()
-            else:
-                return make_response(
-                    jsonify({"error": "No account associated with this token"}), 400
-                )
-
-            # Reset the password
-            entity.password_hash = generate_password_hash(
-                new_password, method="pbkdf2:sha512"
-            )
-
-            # Delete the reset token after use
+        # Check if the token is expired
+        if reset_token_entry.expires_at < datetime.utcnow():
             db.session.delete(reset_token_entry)
             db.session.commit()
+            return make_response(jsonify({"msg": "Token has expired"}), 400)
 
-            return make_response(
-                jsonify({"message": "Password has been reset successfully"}), 200
-            )
+        # Determine which account type to reset based on account_type
+        if account_type == "user":
+            entity = User.query.filter_by(user_id=reset_token_entry.user_id).first()
+        elif account_type == "parent":
+            entity = Parent.query.filter_by(
+                parent_id=reset_token_entry.parent_id
+            ).first()
+        elif account_type == "provider":
+            entity = Provider.query.filter_by(
+                provider_id=reset_token_entry.provider_id
+            ).first()
         else:
-            return make_response(jsonify({"error": "Invalid or expired token"}), 400)
+            return make_response(jsonify({"msg": "Invalid account type"}), 400)
+
+        # Ensure the entity exists
+        if not entity:
+            return make_response(
+                jsonify({"msg": "No account associated with this token"}), 400
+            )
+
+        # Reset the password
+        entity.password_hash = generate_password_hash(
+            new_password
+        )
+
+        # Delete the reset token after use
+        db.session.delete(reset_token_entry)
+        db.session.commit()
+
+        return make_response(
+            jsonify({"msg": "Password has been reset successfully"}), 200
+        )

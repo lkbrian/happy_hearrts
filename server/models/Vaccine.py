@@ -3,6 +3,14 @@ from sqlalchemy_serializer import SerializerMixin
 from datetime import datetime
 import json
 from sqlalchemy.types import TypeDecorator, VARCHAR
+import pytz
+
+EAT = pytz.timezone("Africa/Nairobi")
+
+
+# Function to return the current time in EAT
+def current_eat_time():
+    return datetime.now(EAT)
 
 
 class JSONEncodedList(TypeDecorator):
@@ -30,7 +38,7 @@ class Vaccine(db.Model, SerializerMixin):
     indication = db.Column(db.String, nullable=False)
     side_effects = db.Column(JSONEncodedList, nullable=False)
     info = db.Column(db.String, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable=False, default=current_eat_time)
 
     vaccination_records = db.relationship(
         "Record", back_populates="vaccine", cascade="all, delete-orphan"

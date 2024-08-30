@@ -30,7 +30,7 @@ class ChildrenAPI(Resource):
 
         age= calculate_age(date_of_birth)
         dob = datetime.strptime(data["date_of_birth"], "%Y/%m/%d").date()
-        if dob < date.today():
+        if dob > date.today():
             return make_response(
                 jsonify({"msg": "Enter a past date or today"}), 400
             )
@@ -48,6 +48,7 @@ class ChildrenAPI(Resource):
             db.session.add(child)
             db.session.commit()
             response= make_response(jsonify({"msg":"Child created sucessfully"}),201)
+            return response
         except IntegrityError:
             db.session.rollback()
             response=make_response(jsonify({"msg":"Integrity constraint failed"}),400)

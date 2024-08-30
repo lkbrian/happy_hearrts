@@ -16,7 +16,7 @@ class providersAPI(Resource):
             user = User.query.get_or_404(id)
         if user.role != "provider":
             return {"message": "User is not a provider"}, 400
-        
+
         provider = Provider.query.filter_by(parent_id=id).first()
         response = make_response(jsonify(provider),200)
         return response
@@ -24,7 +24,7 @@ class providersAPI(Resource):
     def post(self):
         data = request.json
         if not data:
-            return jsonify({"msg": "No input provided"}), 400
+            return make_response(jsonify({"msg": "No input provided"}), 400)
 
         try:
             provider = Provider(
@@ -44,10 +44,10 @@ class providersAPI(Resource):
 
         except IntegrityError:
             db.session.rollback()
-            return jsonify({"msg": "Integrity constraint failed"}), 400
+            return make_response(jsonify({"msg": "Integrity constraint failed"}), 400)
 
         except Exception as e:
-            return jsonify({"msg": str(e)}), 500
+            return make_response(jsonify({"msg": str(e)}), 500)
 
     def patch(self,id):
         data = request.json

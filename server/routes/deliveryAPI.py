@@ -24,16 +24,14 @@ class DeliveryAPI(Resource):
         try:
             delivery = Delivery(
                 mode_of_delivery=data["mode_of_delivery"],
-                date=datetime.strptime(data["date"], "%Y-%m-%d"),
-                duration_of_labour=data["duration_of_labour"],
-                hours=data["hours"],
+                date = datetime.strptime(data["date"], "%Y-%m-%d %H:%M"),
+                duration_of_labour=data["duration_of_labour"],                
                 condition_of_mother=data["condition_of_mother"],
                 condition_of_baby=data["condition_of_baby"],
                 birth_weight_at_birth=data["birth_weight_at_birth"],
                 gender=data["gender"],
-                vitamin_A=data.get("vitamin_A"),
                 parent_id=data["parent_id"],
-                conducted_by=data["conducted_by"],
+                provider_id=data["provider_id"],
             )
             db.session.add(delivery)
             db.session.commit()
@@ -59,13 +57,16 @@ class DeliveryAPI(Resource):
         try:
             for field, value in data.items():
                 if hasattr(delivery, field):
+                    if field == "date":  # Handle date conversion
+                        try:
+                            # Convert the string to a datetime object
+                            value = datetime.strptime(value, "%Y-%m-%d %H:%M")
+                        except ValueError:
+                            return make_response(jsonify({"msg": f"Invalid date format for {field}, should be YYYY-MM-DD"}), 400)
                     setattr(delivery, field, value)
+
             db.session.commit()
             return make_response(jsonify({"msg": "Delivery updated successfully"}), 200)
-
-        except IntegrityError:
-            db.session.rollback()
-            return make_response(jsonify({"msg": "Integrity constraint failed"}), 400)
 
         except Exception as e:
             return make_response(jsonify({"msg": str(e)}), 500)

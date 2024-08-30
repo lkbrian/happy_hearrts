@@ -13,13 +13,21 @@ class parentsAPI(Resource):
             return response
         else :
             parent = Parent.query.filter_by(parent_id=id).first()
-            response = make_response(jsonify(parent),200)
-            return response
+            if parent:
+                response = make_response(jsonify(parent.to_dict()), 200)
+                return response
+            else:
+                return make_response(jsonify({"msg": "Parent not found"}), 404)
 
     def post(self):
         data = request.json
         if not data:
             return make_response(jsonify({"msg": "No input provided"}), 400)
+
+        email=data['email']
+        parent = Parent.query.filter_by(email=email).first()
+        if parent :
+            return make_response(jsonify({"msg": "Parent already registered"}), 400)
 
         try:
             parent = Parent(

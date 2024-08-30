@@ -26,12 +26,12 @@ class DischargeSummaryAPI(Resource):
 
         try:
             summary = Discharge_summary(
-                admission_date=datetime.strptime(data["admission_date"], "%Y-%m-%d"),
-                discharge_date=datetime.strptime(data["discharge_date"], "%Y-%m-%d"),
+                admission_date=datetime.strptime(data["admission_date"], "%Y-%m-%d %H:%M"),
+                discharge_date=datetime.strptime(data["discharge_date"], "%Y-%m-%d %H:%M"),
                 discharge_diagnosis=data["discharge_diagnosis"],
                 procedure=data.get("procedure"),
                 parent_id=data["parent_id"],
-                conducted_by=data["conducted_by"],
+                provider_id=data["provider_id"],
             )
             db.session.add(summary)
             db.session.commit()

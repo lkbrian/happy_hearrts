@@ -3,12 +3,33 @@ from sqlalchemy_serializer import SerializerMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
+import pytz
+
+EAT = pytz.timezone("Africa/Nairobi")
+
+
+# Function to return the current time in EAT
+def current_eat_time():
+    return datetime.now(EAT)
+
+
 class Provider(db.Model, SerializerMixin):
     __tablename__ = "providers"
+    serialize_only = (
+        "provider_id",
+        "name",
+        "email",
+        "role",
+        "national_id",
+        "phone_number",
+        "gender",
+        "passport",
+        "appointments",
+    )
     serialize_rules = (
         "-password_hash",
         "-appointments.provider",
-        "-vaccination_records.provider" ,
+        "-vaccination_records.provider",
         "-vaccination_records.child",
     )
 
@@ -25,7 +46,7 @@ class Provider(db.Model, SerializerMixin):
         default="https://res.cloudinary.com/dg6digtc4/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1722952459/profile_xkjsxh.jpg",
     )
     password_hash = db.Column(db.String, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable=False, default=current_eat_time)
 
     deliveries = db.relationship(
         "Delivery", back_populates="provider", cascade="all, delete-orphan"

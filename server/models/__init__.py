@@ -6,7 +6,7 @@ from .Payment import Payment
 from .Provider import Provider
 from .User import User
 from .Vaccine import Vaccine
-from.ResetToken import ResetToken
-
+from .ResetToken import ResetToken
+from .Labtest import LabTest
 
 

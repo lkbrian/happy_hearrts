@@ -24,7 +24,7 @@ class PresentPregnancyAPI(Resource):
 
         try:
             pregnancy = Present_pregnancy(
-                date=datetime.strptime(data["date"], "%Y-%m-%d"),
+                date=datetime.strptime(data["date"], "%Y-%m-%d %H:%M"),
                 weight_in_kg=data["weight_in_kg"],
                 urinalysis=data["urinalysis"],
                 blood_pressure=data["blood_pressure"],

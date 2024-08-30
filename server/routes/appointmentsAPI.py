@@ -25,8 +25,9 @@ class appointmentsAPI(Resource):
             return make_response(jsonify({"msg":"Enter a date later than today or today"}),400)
         try:
             appointment = Appointment(
-                child_id=data['child_id'],
+                parent_id=data['parent_id'],
                 provider_id=data['provider_id'],
+                reason=data['reason'],
                 appointment_date=appointment_date,
             )
             db.session.add(appointment)

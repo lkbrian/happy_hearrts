@@ -29,7 +29,7 @@ class MedicationsAPI(Resource):
                 route=data.get("route"),
                 dose_per_day=data.get("dose_per_day"),
                 referral=data.get("referral"),
-                conducted_by=data["conducted_by"],
+                provider_id=data["provider_id"],
                 parent_id=data["parent_id"],
             )
             db.session.add(medication)

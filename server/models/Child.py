@@ -2,6 +2,14 @@ from config import db
 from sqlalchemy_serializer import SerializerMixin
 from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
+import pytz
+
+EAT = pytz.timezone("Africa/Nairobi")
+
+
+# Function to return the current time in EAT
+def current_eat_time():
+    return datetime.now(EAT)
 
 
 class Child(db.Model, SerializerMixin):
@@ -14,11 +22,9 @@ class Child(db.Model, SerializerMixin):
         "age",
         "gender",
         "passport",
-        "vaccination_records",
-        "appointments",
         "parent_info",
     )
-    serialize_rules = ("-parent_id", "-vaccination_records.child", "-appointments.child")
+    serialize_rules = ("-parent_id",)
     child_id = db.Column(db.Integer, primary_key=True)
     fullname = db.Column(db.String, nullable=False)
     certificate_No = db.Column(db.Integer, unique=True, nullable=False)
@@ -30,15 +36,11 @@ class Child(db.Model, SerializerMixin):
         db.Integer, db.ForeignKey("parents.parent_id"), nullable=False
     )
 
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable=False, default=current_eat_time)
 
     parent = db.relationship("Parent", back_populates="children")
-    vaccination_records = db.relationship(
-        "Record", back_populates="child", cascade="all, delete-orphan"
-    )
-    appointments = db.relationship(
-        "Appointment", back_populates="child", cascade="all, delete-orphan"
-    )
+    lab_tests = db.relationship("LabTest", back_populates="child", lazy=True)
+    records = db.relationship("Record", back_populates="child", lazy=True)
 
     @hybrid_property
     def parent_info(self):
@@ -56,36 +58,45 @@ class Child(db.Model, SerializerMixin):
 
 
 class Record(db.Model, SerializerMixin):
-    __tablename__ = "records"
-    serialize_rules = (
-        "record_id",
-        "child_id",
+    __tablename__ = "vacination_records"
+    serialize_only=( "record_id",
+        "parent_id",
         "vaccine_id",
         "provider_id",
+        "child_id", 
         "timestamp",
-        "info",
+        "info",)
+    serialize_rules = (
+       
         "-vaccine",
         "-child",
         "-provider",
     )
     record_id = db.Column(db.Integer, primary_key=True)
-    child_id = db.Column(db.Integer, db.ForeignKey("children.child_id"), nullable=False)
+    parent_id = db.Column(
+        db.Integer, db.ForeignKey("parents.parent_id"), nullable=False
+    )
     vaccine_id = db.Column(
         db.Integer, db.ForeignKey("vaccines.vaccine_id"), nullable=False
     )
     provider_id = db.Column(
         db.String, db.ForeignKey("providers.provider_id"), nullable=False
     )
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    child_id = db.Column(
+        db.Integer, db.ForeignKey("children.child_id"), nullable=True  
+    )
+    timestamp = db.Column(db.DateTime, nullable=False, default=current_eat_time)
 
-    child = db.relationship("Child", back_populates="vaccination_records")
+    parent = db.relationship("Parent", back_populates="vaccination_records")
     vaccine = db.relationship("Vaccine", back_populates="vaccination_records")
     provider = db.relationship("Provider", back_populates="vaccination_records")
+    child = db.relationship("Child", back_populates="records") 
 
     @hybrid_property
     def info(self):
         return {
-            "child": self.child.fullname,
+            "parent": self.parent.name,
             "provider": self.provider.name,
+            "child":self.child.fullname,
             "vaccine": self.vaccine.name,
         }

@@ -18,6 +18,116 @@
   padding: 5px 16px;
   background: #3670D3;
 }
-.form{
-  width: 500px;
+.login-link{
+  color: #3670D3;
 }
+.sidebar_link{
+  padding: 10px 8px;
+  display: flex;
+  align-items: center;
+}
+.sidebar_link.active,
+.sidebar_link:hover{
+  background: #fff;
+  color: #3670D3;
+  font-weight: bold;
+}
+
+.react-calendar {
+  border: none;
+  border-radius: 8px;
+}
+
+.react-calendar__tile {
+  height: 40px;
+  font-size: 13px;
+  color: #111;
+}
+
+.react-calendar__tile--now {
+  background: #35B6E8;
+  color: white;
+  border-radius: 10%;
+  height: 40px;
+  width: 20px;
+}
+
+.react-calendar__tile--active {
+  background: #35B6E8;
+  color: white;
+  border-radius: 10%;
+    height: 20px;
+  width: 20px;
+}
+
+.react-calendar__tile--hover {
+  background-color: #edf2f7;
+  border-radius: 50%;
+}
+
+
+.react-calendar__tile {
+  height: 40px;
+  width: 40px;
+  font-size: 13px;
+  color: #111;
+}
+
+.react-calendar__tile--now {
+  background: #023047;
+  color: white;
+  border-radius: 10%;
+  height: 40px;
+  width: 40px;
+}
+.react-calendar__month-view__days__day--weekend {
+  color: crimson;
+}
+.react-calendar__tile--active {
+  background: #023047;
+  color: white;
+  border-radius: 10%;
+  height: 40px;
+  width: 40px;
+}
+
+/* Style the month and year display */
+.react-calendar__navigation {
+  display: flex;
+  justify-content: center;
+}
+
+
+.react-calendar__navigation__label {
+  font-size: 22px;
+  font-weight: bold;
+  color: #023047;
+  font-family: Lato;
+}
+
+/* Target the scrollbar */
+.scrollbar::-webkit-scrollbar {
+  width: 8px; /* Set the width of the scrollbar */
+  height: 8px; /* Set the height of the scrollbar */
+  background-color: transparent; /* Set the background color of the scrollbar */
+  border-radius: 2px; 
+  /* Set the border radius of the scrollbar */
+}
+
+/* Target the thumb of the scrollbar */
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3670D3; /* Set the background color of the thumb */
+  border-radius: 5px; /* Set the border radius of the thumb */  
+  border: none;
+  outline: none; /* Add a shadow to the thumb */
+}
+
+/* Target the track of the scrollbar */
+.scrollbar::-webkit-scrollbar-track {
+  background-color: transparent; /* Set the background color of the track */
+  border-radius: 0px; /* Set the border radius of the track */
+   /* Add a shadow to the track */
+  border: none;
+  outline: none;
+}
+  

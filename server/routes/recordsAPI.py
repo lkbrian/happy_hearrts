@@ -1,11 +1,11 @@
 from config import db
 from flask_restful import Resource
-from models import Record
+from models import Record,Child,Parent,Provider,Vaccine
 from flask import make_response, jsonify, request
 from sqlalchemy.exc import IntegrityError
 
 
-class recordsApi(Resource):
+class RecordsApi(Resource):
     def get(self, id=None):
         if id is None:
             records = [r.to_dict() for r in Record.query.all()]
@@ -21,11 +21,39 @@ class recordsApi(Resource):
         if not data:
             return make_response(jsonify({"msg": "No input provided"}), 400)
 
+        parent_id = data["parent_id"]
+        child_certificate_no = data["child_certificate_no"]
+        provider_id=data["provider_id"]
+        vaccine_id=data["vaccine_id"]
+
+        if not parent_id or not child_certificate_no:
+            return make_response(jsonify({"msg": "Parent ID and Child Certificate No are required"}), 400)
+
+        parent = Parent.query.filter_by(parent_id=parent_id).first()
+        if not parent:
+            return make_response(jsonify({"msg": "Parent not found"}), 404)
+
+        child = Child.query.filter_by(certificate_No=child_certificate_no).first()
+        if not child:
+            return make_response(jsonify({"msg": "Child not found"}), 404)
+
+        provider = Provider.query.filter_by(provider_id=provider_id).first()
+        if not provider:
+            return make_response(jsonify({"msg": "Provider not found"}), 404)
+        
+        vaccine = Vaccine.query.filter_by(vaccine_id=vaccine_id).first()
+        if not vaccine:
+            return make_response(jsonify({"msg": "Vaccine not found"}), 404)
+
+        if child.parent_id != parent.parent_id:
+            return make_response(jsonify({"msg": "Child does not belong to the given parent"}), 400)
+
         try:
             record = Record(
-                child_id=data["child_id"],
-                provider_id=data["provider_id"],
-                vaccine_id=data["vaccine_id"],
+                parent_id=parent_id,
+                child_id=child.child_id, 
+                provider_id=provider_id,
+                vaccine_id=vaccine_id
             )
             db.session.add(record)
             db.session.commit()
@@ -39,7 +67,6 @@ class recordsApi(Resource):
 
         except Exception as e:
             return jsonify({"msg": str(e)}), 500
-
     def patch(self, id):
         data = request.json
         if not data:
