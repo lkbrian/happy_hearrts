@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import request, jsonify, make_response
-from models import Present_pregnancy
+from models import Present_pregnancy,Parent
 from config import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
@@ -21,7 +21,11 @@ class PresentPregnancyAPI(Resource):
         data = request.json
         if not data:
             return make_response(jsonify({"msg": "No input provided"}), 400)
+        parent_id=data["parent_id"]
 
+        parent=Parent.query.filter_by(parent_id=parent_id)
+        if not parent:
+            return make_response(jsonify({"msg": "Parent not found"}), 404)
         try:
             pregnancy = Present_pregnancy(
                 date=datetime.strptime(data["date"], "%Y-%m-%d %H:%M"),
@@ -33,7 +37,7 @@ class PresentPregnancyAPI(Resource):
                 fundal_height=data["fundal_height"],
                 comments=data["comments"],
                 clinical_notes=data["clinical_notes"],
-                parent_id=data["parent_id"],
+                parent_id=parent.parent_id
             )
             db.session.add(pregnancy)
             db.session.commit()
@@ -59,6 +63,7 @@ class PresentPregnancyAPI(Resource):
 
         try:
             for field, value in data.items():
+                
                 if hasattr(pregnancy, field):
                     setattr(pregnancy, field, value)
             db.session.commit()

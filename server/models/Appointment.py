@@ -20,11 +20,13 @@ class Appointment(db.Model, SerializerMixin):
         "timestamp",
         "info",
         "reason",
+        "status",  # Add status to serialized fields
     )
     serialize_rules = (
         "-parent.appointments",
         "-provider.appointments",
     )
+
     appointment_id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(
         db.Integer, db.ForeignKey("parents.parent_id"), nullable=False
@@ -33,8 +35,13 @@ class Appointment(db.Model, SerializerMixin):
         db.Integer, db.ForeignKey("providers.provider_id"), nullable=False
     )
     reason = db.Column(db.String, nullable=False)
-    appointment_date = db.Column(db.DateTime, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=current_eat_time)
+
+    appointment_date = db.Column(db.DateTime(timezone=True), nullable=False)
+    timestamp = db.Column(
+        db.DateTime(timezone=True), nullable=False, default=current_eat_time
+    )
+    
+    status = db.Column(db.String, nullable=True, default="pending")
 
     parent = db.relationship("Parent", back_populates="appointments")
     provider = db.relationship("Provider", back_populates="appointments")
@@ -45,3 +52,5 @@ class Appointment(db.Model, SerializerMixin):
             "parent_name": self.parent.name,
             "provider_name": self.provider.name,
         }
+
+

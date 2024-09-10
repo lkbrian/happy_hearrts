@@ -1,6 +1,6 @@
 from flask import jsonify, make_response, request
 from flask_restful import Resource
-from models import Discharge_summary
+from models import Discharge_summary,Parent,Provider
 from config import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
@@ -23,7 +23,14 @@ class DischargeSummaryAPI(Resource):
         data = request.json
         if not data:
             return make_response(jsonify({"msg": "No input provided"}), 400)
+        parent = Parent.query.get(data.get("parent_id"))
+        provider = Provider.query.get(data.get("provider_id"))
 
+        if not parent:
+            return make_response(jsonify({"msg": "Parent not found"}), 404)
+
+        if not provider:
+            return make_response(jsonify({"msg": "Provider not found"}), 404)
         try:
             summary = Discharge_summary(
                 admission_date=datetime.strptime(data["admission_date"], "%Y-%m-%d %H:%M"),
@@ -58,6 +65,16 @@ class DischargeSummaryAPI(Resource):
 
         try:
             for field, value in data.items():
+
+                if field == "parent_id":
+                    parent = Parent.query.get(value)
+                    if not parent:
+                        return make_response(jsonify({"msg": "Parent not found"}), 404)
+            
+                elif field == "provider_id":
+                    provider = Provider.query.get(value)
+                    if not provider:
+                        return make_response(jsonify({"msg": "Provider not found"}), 404)                
                 if hasattr(summary, field):
                     setattr(summary, field, value)
             db.session.commit()
