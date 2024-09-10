@@ -1,68 +1,133 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.links.active{
+  color: #3670D3;
+  text-decoration: underline;
+  font-weight: 600;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
 }
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.login{
+  border: 2px solid #3670D3;
+  color: #3670D3;
+  border-radius: .5rem;
+  padding: 5px 16px;
 }
-a:hover {
-  color: #535bf2;
+.register{
+  border: none;
+  color: #fff;
+  border-radius: .5rem;
+  padding: 5px 16px;
+  background: #3670D3;
 }
-
-body {
-  margin: 0;
+.login-link{
+  color: #3670D3;
+}
+.sidebar_link{
+  padding: 10px 8px;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  align-items: center;
+}
+.sidebar_link.active,
+.sidebar_link:hover{
+  background: #fff;
+  color: #3670D3;
+  font-weight: bold;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
+.react-calendar {
+  border: none;
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.react-calendar__tile {
+  height: 40px;
+  font-size: 13px;
+  color: #111;
 }
+
+.react-calendar__tile--now {
+  background: #35B6E8;
+  color: white;
+  border-radius: 10%;
+  height: 40px;
+  width: 20px;
+}
+
+.react-calendar__tile--active {
+  background: #35B6E8;
+  color: white;
+  border-radius: 10%;
+    height: 20px;
+  width: 20px;
+}
+
+.react-calendar__tile--hover {
+  background-color: #edf2f7;
+  border-radius: 50%;
+}
+
+
+.react-calendar__tile {
+  height: 40px;
+  width: 40px;
+  font-size: 13px;
+  color: #111;
+}
+
+.react-calendar__tile--now {
+  background: #023047;
+  color: white;
+  border-radius: 10%;
+  height: 40px;
+  width: 40px;
+}
+.react-calendar__month-view__days__day--weekend {
+  color: crimson;
+}
+.react-calendar__tile--active {
+  background: #023047;
+  color: white;
+  border-radius: 10%;
+  height: 40px;
+  width: 40px;
+}
+
+/* Style the month and year display */
+.react-calendar__navigation {
+  display: flex;
+  justify-content: center;
+}
+
+
+.react-calendar__navigation__label {
+  font-size: 22px;
+  font-weight: bold;
+  color: #023047;
+  font-family: Lato;
+}
+
+/* Target the scrollbar */
+.scrollbar::-webkit-scrollbar {
+  width: 8px; /* Set the width of the scrollbar */
+  height: 8px; /* Set the height of the scrollbar */
+  background-color: transparent; /* Set the background color of the scrollbar */
+  border-radius: 2px; 
+  /* Set the border radius of the scrollbar */
+}
+
+/* Target the thumb of the scrollbar */
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3670D3; /* Set the background color of the thumb */
+  border-radius: 5px; /* Set the border radius of the thumb */  
+  border: none;
+  outline: none; /* Add a shadow to the thumb */
+}
+
+/* Target the track of the scrollbar */
+.scrollbar::-webkit-scrollbar-track {
+  background-color: transparent; /* Set the background color of the track */
+  border-radius: 0px; /* Set the border radius of the track */
+   /* Add a shadow to the track */
+  border: none;
+  outline: none;
+}
+  
