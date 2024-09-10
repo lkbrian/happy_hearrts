@@ -1,10 +1,33 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  Text,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+} from "@chakra-ui/react";
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { Grid, GridItem } from "@chakra-ui/react";
+import { useParentStore } from "../utils/store";
+import _ from "lodash";
+
 
 function Dashboard() {
+  const parent = useParentStore((state)=>(state.parent))
+const child = _.get(parent, "children[0]", {}); 
+const present_pregnacy = _.get(parent,"present_pregnacy[parent.present_pregnacy.length - 1]",{});
+const vaccination_records = _.get(parent, "vaccination_records", []);
+const payments = _.get(parent, "payments", []).slice(-4);
+const appointments = _.get(parent, "appointments", []);
+
   const [date, setDate] = useState(new Date());
   return (
     <Box
@@ -26,13 +49,13 @@ function Dashboard() {
         bg={"#fff"}
         px={"10px"}
       >
-        <Text mt={"10px"}>
-          Welcome back,
-          <Heading fontSize={"20px"}>Rachel Mwangi</Heading>
-        </Text>
+        <Box mt={"10px"}>
+          <Text>Welcome back,</Text>
+          <Heading fontSize={"20px"}>{parent.name}</Heading>
+        </Box>
         <Box bg={"#3670d3"} borderRadius={"50%"} h={"50px"} w={"50px"} />
       </Flex>
-      <Flex mt={"30px"} gap={"50px"} alignItems={'flex-start'}>
+      <Flex mt={"30px"} gap={"50px"} alignItems={"flex-start"}>
         {/* Main Content Section */}
         <Flex flexBasis="80%" gap={"10px"} flexWrap={"wrap"}>
           <Grid
@@ -56,12 +79,16 @@ function Dashboard() {
               borderLeft={"8px"}
               borderColor={"lavenderpurple"}
             >
-              <Heading size={"md"} mb={"10px"}>
-                Children
+              <Heading size={"md"} py={"4px"} mb={"1px"}>
+                Child
               </Heading>
-              <Text>Emerson Wambugu</Text>
-              <Text>2 years 3 weeks</Text>
-              <Text>Vaccination status: Pending</Text>
+              <Text fontWeight={"bold"}>Name:{child.fullname}</Text>
+              <Text>Certificate No: {child.certificate_No}</Text>
+              <Text>Age: {child.age}</Text>
+              <Text>
+                Dateof Birth:{" "}
+                {new Date(child.date_of_birth).toLocaleDateString()}
+              </Text>
             </GridItem>
 
             <GridItem
@@ -91,14 +118,28 @@ function Dashboard() {
               shadow={" 0 2px 8px rgba(0, 0, 0, 0.1)"}
               bg={"happyblue"}
             >
-              <Heading size={"md"} mb={"10px"}>
+              <Heading size={"md"} py={"4px"} mb={"1px"}>
                 Present Pregnancy
               </Heading>
-              <Text>Emerson Wambugu</Text>
-              <Text>2 years 3 weeks</Text>
-              <Text>Vaccination status: Pending</Text>
+              <Flex gap={"3px"}>
+                <Text>Maturity:</Text>
+                <Text>{present_pregnacy.maturity_in_weeks} weeks</Text>
+              </Flex>
+              <Flex gap={"3px"}>
+                <Text>Fundal height:</Text>
+                <Text>{present_pregnacy.fundal_height}</Text>
+              </Flex>
+              <Flex gap={"3px"}>
+                <Text>Blood pressure:</Text>
+                <Text>{present_pregnacy.blood_pressure}</Text>
+              </Flex>
+              <Flex gap={"3px"}>
+                <Text>Clinical notes:</Text>
+                <Text>{present_pregnacy.clinical_notes}</Text>
+              </Flex>
             </GridItem>
 
+            {/* Vaccination Records */}
             <GridItem
               colSpan={3}
               rowSpan={2}
@@ -107,13 +148,37 @@ function Dashboard() {
               px={"10px"}
               shadow={" 0 2px 8px rgba(0, 0, 0, 0.1)"}
             >
-              <Heading size={"md"} mb={"10px"}>
+              <Heading size={"md"} py={"4px"} mb={"10px"}>
                 Vaccination records
               </Heading>
-              <Text>Emerson Wambugu</Text>
-              <Text>2 years 3 weeks</Text>
-              <Text>Vaccination status: Pending</Text>
+              {vaccination_records.length > 0 ? (
+                <Table variant="unstyled" size="sm">
+                  <Thead bg={"happyblue"} color={"#fff"}>
+                    <Tr>
+                      <Th>Child</Th>
+                      <Th>Provider</Th>
+                      <Th>Vaccine</Th>
+                      <Th>Date</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {vaccination_records.map((record) => (
+                      <Tr key={record.record_id}>
+                        <Td>{record.info.child}</Td>
+                        <Td>{record.info.provider}</Td>
+                        <Td>{record.info.vaccine}</Td>
+                        <Td>
+                          {new Date(record.timestamp).toLocaleDateString()}
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              ) : (
+                <Text>No vaccination records available</Text>
+              )}
             </GridItem>
+
             <GridItem
               rowSpan={2}
               borderRadius={".7rem"}
@@ -123,12 +188,35 @@ function Dashboard() {
               px={"10px"}
               shadow={" 0 2px 8px rgba(0, 0, 0, 0.1)"}
             >
-              <Heading size={"md"} mb={"10px"}>
+              <Heading size={"md"} py={"4px"} mb={"10px"}>
                 Payment records
               </Heading>
-              <Text>Emerson Wambugu</Text>
-              <Text>2 years 3 weeks</Text>
-              <Text>Vaccination status: Pending</Text>
+              {payments.length > 0 ? (
+                <Table variant="unstyled" size="md">
+                  <Thead bg={"happyblue"} color={"#fff"}>
+                    <Tr>
+                      <Th>Payment ID</Th>
+                      <Th>Amount</Th>
+                      <Th>Method</Th>
+                      <Th>Date</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody _even={{ bg: "#EDEFF8" }}>
+                    {payments.map((payment) => (
+                      <Tr key={payment.payment_id}>
+                        <Td>{payment.payment_id}</Td>
+                        <Td>{payment.amount}</Td>
+                        <Td>{payment.payment_method}</Td>
+                        <Td>
+                          {new Date(payment.timestamp).toLocaleDateString()}
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              ) : (
+                <Text>No payments records available</Text>
+              )}
             </GridItem>
           </Grid>
         </Flex>
@@ -158,7 +246,7 @@ function Dashboard() {
               nextLabel={null}
               prevLabel={null}
             />
-            <Heading color={"#111"}  fontSize={"20px"} mt={'6px'}>
+            <Heading color={"#111"} fontSize={"20px"} mt={"6px"}>
               Doctors appointment
             </Heading>
             <Box

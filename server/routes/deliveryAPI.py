@@ -1,9 +1,10 @@
 from flask import jsonify, make_response, request
 from flask_restful import Resource
-from models import Delivery
+from models import Delivery, Parent, Provider
 from config import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
+
 
 class DeliveryAPI(Resource):
     def get(self, id=None):
@@ -20,12 +21,19 @@ class DeliveryAPI(Resource):
         data = request.json
         if not data:
             return make_response(jsonify({"msg": "No input provided"}), 400)
+        parent = Parent.query.get(data.get("parent_id"))
+        provider = Provider.query.get(data.get("provider_id"))
 
+        if not parent:
+            return make_response(jsonify({"msg": "Parent not found"}), 404)
+
+        if not provider:
+            return make_response(jsonify({"msg": "Provider not found"}), 404)
         try:
             delivery = Delivery(
                 mode_of_delivery=data["mode_of_delivery"],
-                date = datetime.strptime(data["date"], "%Y-%m-%d %H:%M"),
-                duration_of_labour=data["duration_of_labour"],                
+                date=datetime.strptime(data["date"], "%Y-%m-%d %H:%M"),
+                duration_of_labour=data["duration_of_labour"],
                 condition_of_mother=data["condition_of_mother"],
                 condition_of_baby=data["condition_of_baby"],
                 birth_weight_at_birth=data["birth_weight_at_birth"],
@@ -48,21 +56,31 @@ class DeliveryAPI(Resource):
     def patch(self, id):
         data = request.json
         if not data:
-            return jsonify({"msg": "No input provided"})
+            return make_response(jsonify({"msg": "No input provided"}), 400)
 
         delivery = Delivery.query.filter_by(delivery_id=id).first()
         if not delivery:
-            return jsonify({"msg": "Delivery not found"})
+            return make_response(jsonify({"msg": "Delivery not found"}), 404)
 
         try:
             for field, value in data.items():
+                if field == "date":
+                    try:
+                        value = datetime.strptime(value, "%Y-%m-%d %H:%M")
+                    except ValueError:
+                        return make_response(jsonify({"msg": f"Invalid date format for {field}, should be YYYY-MM-DD HH:MM"}),400,)
+
+                elif field == "parent_id":
+                    parent = Parent.query.get(value)
+                    if not parent:
+                        return make_response(jsonify({"msg": "Parent not found"}), 404)
+            
+                elif field == "provider_id":
+                    provider = Provider.query.get(value)
+                    if not provider:
+                        return make_response(jsonify({"msg": "Provider not found"}), 404)
+                
                 if hasattr(delivery, field):
-                    if field == "date":  # Handle date conversion
-                        try:
-                            # Convert the string to a datetime object
-                            value = datetime.strptime(value, "%Y-%m-%d %H:%M")
-                        except ValueError:
-                            return make_response(jsonify({"msg": f"Invalid date format for {field}, should be YYYY-MM-DD"}), 400)
                     setattr(delivery, field, value)
 
             db.session.commit()

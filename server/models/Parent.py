@@ -320,7 +320,7 @@ class Previous_pregnancy(db.Model, SerializerMixin):
             "appointments": [a.to_dict() for a in self.appointments],
             "children": [c.to_dict() for c in self.children],
             "medical_info_parent": [m.to_dict() for m in self.medical_info_parent],
-            "lab_tests": [l.to_dict() for l in self.lab_tests],
+            "lab_tests": [lab.to_dict() for lab in self.lab_tests],
             "medications": [med.to_dict() for med in self.medications],
             "payments": [p.to_dict() for p in self.payments],
             "present_pregnancy": [pp.to_dict() for pp in self.present_pregnancy],

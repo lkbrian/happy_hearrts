@@ -47,17 +47,21 @@ class PaymentAPI(Resource):
             db.session.rollback()
             return make_response(jsonify({"msg": str(e)}), 500)
 
-    def patch(self, payment_id):
+    def patch(self, id):
         data = request.json
         if not data:
             return make_response(jsonify({"msg": "No input provided"}), 400)
 
-        payment = Payment.query.filter_by(payment_id=payment_id).first()
+        payment = Payment.query.filter_by(payment_id=id).first()
         if not payment:
             return make_response(jsonify({"msg": "Payment not found"}), 404)
 
+        parent = Parent.query.filter_by(parent_id=id).first()
+        if not parent:
+            return make_response(jsonify({"msg": "Parent not found"}), 404)
+
         if "parent_id" in data:
-            payment.parent_id = data.get("parent_id")
+            payment.parent_id = parent.parent_id
         if "amount" in data:
             payment.amount = data.get("amount")
         if "payment_method" in data:
@@ -71,7 +75,6 @@ class PaymentAPI(Resource):
             db.session.rollback()
             return jsonify({"msg": str(e)}), 500
 
-    # DELETE method to delete an existing payment
     def delete(self, id):
         payment = Payment.query.filter_by(payment_id=id).first()
         if not payment:

@@ -1,5 +1,5 @@
 # from models import  Appointment,Child,Parent,Payment,Provider,Record,User,Vaccine
-from config import api, app
+from config import api, app,scheduler
 from routes.appointmentsAPI import appointmentsAPI
 from routes.authAPI import Home,Login, Logout
 from routes.childrenAPI import ChildrenAPI
@@ -16,6 +16,7 @@ from routes.presentpregnancyAPI import PresentPregnancyAPI
 from routes.paymentAPI import PaymentAPI
 from routes.labtestAPI import LabTestAPI
 from routes.recordsAPI import RecordsApi
+from utils.customs import update_appointment_statuses
 
 api.add_resource(Home,"/")
 api.add_resource(UserAPI,'/users',"/users/<int:id>")
@@ -36,6 +37,8 @@ api.add_resource(ForgotPassword,"/forgot_password")
 api.add_resource(ResetPassword,"/reset_password")
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
+scheduler.add_job(update_appointment_statuses, "interval", hours=24)
 
 if __name__ == "__main__":
+    scheduler.start()
     app.run(port=5555,debug=True)

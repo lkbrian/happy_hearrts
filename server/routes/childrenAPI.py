@@ -2,7 +2,7 @@ from flask import make_response, jsonify, request
 from flask_restful import Resource
 from config import db
 from utils.Age import  calculate_age
-from models import Child
+from models import Child,Parent
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime,date
 
@@ -34,7 +34,9 @@ class ChildrenAPI(Resource):
             return make_response(
                 jsonify({"msg": "Enter a past date or today"}), 400
             )
-        # creating a child object
+        parent = Parent.query.get(data.get("parent_id"))
+        if not parent:
+            return make_response(jsonify({"msg": "Parent not found"}), 404)
         try:
             child = Child(
             fullname=data["fullname"],
@@ -69,6 +71,10 @@ class ChildrenAPI(Resource):
         try:
             for field,value in data.items():
                 if hasattr(child,field):
+                    if field =="parent_id":
+                        parent = Parent.query.get(data.get("parent_id"))
+                        if not parent:
+                            return make_response(jsonify({"msg": "Parent not found"}), 404)
                     setattr(child,field,value)
             db.session.commit()
             return make_response(jsonify({"msg": "updating child sucessful"}), 200)

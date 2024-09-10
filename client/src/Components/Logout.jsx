@@ -33,6 +33,9 @@ function Logout() {
         navigate("/");
       } else {
         const errorData = await response.json();
+        if (errorData.msg == "Token has expired") {
+          navigate("/login");
+        }
         toast.error(errorData.msg || "An error occurred", {
           position: "top-right",
           autoClose: 6000,
@@ -43,6 +46,7 @@ function Logout() {
           },
         });
         throw new Error(errorData.msg || "An error occurred");
+
       }
     } catch (error) {
       console.error(error);

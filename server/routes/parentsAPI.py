@@ -66,7 +66,7 @@ class parentsAPI(Resource):
                 if hasattr(parent,field):
                     setattr(parent,field,value)
             db.session.commit()
-            response = make_response(jsonify({"msg":"Parent updated succesfully"}))
+            response = make_response(jsonify({"msg":"Parent updated succesfully"}),200)
         except IntegrityError:
             db.session.rollback()
             response = make_response(
